@@ -84,9 +84,15 @@ class domain_membership (
     $_machine_ou = '$null'
   }
 
+  if $username =~ /@/ {
+    $_username = $username
+  } else {
+    $_username = "${username}@${domain}"
+  }
+
   # Since the powershell command is combersome, we'll construct it here for clarity... well, almost clarity
   #
-  $command = "(Get-WmiObject -Class Win32_ComputerSystem).JoinDomainOrWorkGroup('${domain}',${_password},'${username}@${domain}',${_machine_ou},${join_options})"
+  $command = "(Get-WmiObject -Class Win32_ComputerSystem).JoinDomainOrWorkGroup('${domain}',${_password},'${_username}',${_machine_ou},${join_options})"
 
   exec { 'join_domain':
     command  => "exit ${command}.ReturnValue",
